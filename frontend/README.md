@@ -1,70 +1,121 @@
-# Getting Started with Create React App
+# User Management System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a simple user management API with a frontend application. It allows you to manage users by creating, reading, updating, deleting, searching, and logging in.
 
-## Available Scripts
+- The backend is built with Node.js and Express.
 
-In the project directory, you can run:
+- The frontend is built with React.
 
-### `npm start`
+- Data is stored in a local SQLite database.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The goal of this setup is to improve an old Python API by making the code cleaner, safer, and easier to maintain.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🎯 Project Structure
 
-### `npm test`
+```
+retainsure_assignment/
+├── backend/
+│   ├── server.js              # Express server setup
+│   ├── healthcare.db          # SQLite database
+│   └── package.json           # Backend dependencies
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Dashboard/     # Main dashboard component
+│   │   │   ├── UserList/      # List all users, with search feature
+│   │   │   ├── UserDetail/    # View user details, edit and delete buttons
+│   │   │   └── UserForm/      # Form to create or edit a user
+│   │   │   ├── Login/         # Login form component
+│   │   ├── App.js             # Main application component
+│   │   ├── App.css            # Global styles
+│   │   └── index.js           # React entry point
+│   └── package.json           # Frontend dependencies
+└── README.md
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm package manager
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Clone the repository**
+   ```bash
+   git clone <https://github.com/seshu362/RetainSure-UserManagement-Task-1>
+   cd retainsure_assignment
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **Setup Backend**
+   ```bash
+   cd backend
+   npm install
+   node server.js
+   ```
+   Server will run on http://localhost:5000
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Setup Frontend** (in new terminal)
+   ```bash
+   cd frontend
+   npm install
+   npm start
+   ```
+   Application will open on http://localhost:3001
 
-### `npm run eject`
+##  Backend (backend/)
+- Contains the Node.js Express server in a single file server.js.
+- Connects to a SQLite database file users.db which stores all users.
+- Implements all required API endpoints for user management:
+    - Health check (GET /)
+    - List all users (GET /users)
+    - Get a specific user by ID (GET /user/:id)
+    - Create a new user (POST /users)
+    - Update an existing user (PUT /user/:id)
+    - Delete a user (DELETE /user/:id)
+    - Search users by name (GET /search?name=)
+    - User login (POST /login)
+- Uses parameterized queries to avoid SQL injection.
+- Returns meaningful JSON responses with appropriate HTTP status codes.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+##  Frontend (frontend/)
+- Built with React for a simple user interface.
+- Provides screens to:
+    - List all users with search functionality.
+    - View individual user details.
+    - Create and edit users.
+    - Delete users.
+    - Login as a user.
+- Uses normal CSS for styling to keep UI clean and straightforward.
+- All components live inside src/components folder, each with its own folder and CSS.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Major issues identified in the original Python code:
+- It put user input directly into database queries, which is dangerous and can cause security problems.
+- It didn’t check if the data users sent was complete or valid.
+- Passwords were stored as plain text, which is not safe.
+- The error messages were just simple text, no proper status codes or clear info for users.
+- The database connection was shared in a way that could cause problems when multiple users access it at the same time.
+- Lack of Input Validation No checks for required data fields or data format.
+- All logic was inline within route handlers, and some responses were plain text, limiting maintainability.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## What I changed and why:
+- Rewrote the backend in Node.js with Express because it’s easier for me to work with asynchronous code and modern practices.
+- Used safe, parameterized SQL queries so inputs can’t cause security issues.
+- Added checks to make sure all the needed information is there before saving or updating.
+- Used proper HTTP status codes (like 400 for bad requests, 404 if a user isn’t found) and all responses return JSON objects with clear messages or errors instead of plain strings..
+- Made sure the database is set up properly before starting the server.
+- Database Initialization on Startup Ensures the `users` table exists before processing requests.
+- Proper HTTP Status Codes Used `200`, `201`, `400`, `401`, `404`, `409`, `500` to align with REST API best practices
+- Kept all the code in one file, keeping it simple and easy to understand like you wanted.
+- Unique Email Constraint Handling Returns `409 Conflict` when trying to create a user with an already existing email.
+- Used a better database connection style that avoids problems from sharing a cursor globally.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## What I assumed or  trade-offs:
+- Passwords are still saved as plain text to match the original code and the challenge scope, but for a real project, passwords should always be hashed.
+- Didn’t add any new features or routes — kept everything the same as before.
 
-## Learn More
+## What I would do with more time:
+- Make passwords secure by hashing them and add proper login/authentication (like JWT tokens).
+- Add user permissions so that only the logged-in user can edit or delete their own data. While users could still view others’ data, actions like editing or deleting should be restricted. This would be part of implementing role-based access control, ensuring users can only perform actions they are authorized for.
+- Set up logging and error alerting to quickly catch and fix problems.
+- Organize the backend code into smaller modules for easier maintenance.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
