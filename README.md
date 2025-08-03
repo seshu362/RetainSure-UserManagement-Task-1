@@ -60,7 +60,7 @@ retainsure_assignment/
    npm install
    npm start
    ```
-   Application will open on http://localhost:3001
+   Application will open on http://localhost:3000
 
 ##  Backend (backend/)
 - Contains the Node.js Express server in a single file server.js.
